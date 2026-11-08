@@ -3264,14 +3264,7 @@
             scrollToBottom();
 
             try {
-              const directSystemPrompt = `你是一名日本顶级大喜利（Oogiri）选手。
-核心法则：70% 真实日常常识地基 + 30% 单点意外错位。
-请针对命题给出1句让人拍案叫绝、秒懂幽默的大喜利金句。
-规范要求：
-1. 语态对齐：问台词/歌词直接回答第一人称台词本身，问行为/现象直接回答客观事实。
-2. 长度：12~20字纯自然大白话，禁止公文腔与概念拼凑。
-3. 结构：纯汉字数字，零标点符号，零空格，将最核心的包袱底词置于句末。
-直接输出这唯一一句大喜利金句，严禁包含任何前缀、引号或解释说明。`;
+              const directSystemPrompt = `请对下面的大喜利题目给出一句幽默搞笑的回答，只输出这一句话本身。`;
 
               const reply = await callLlmWithBackoff({
                 systemPrompt: directSystemPrompt,
