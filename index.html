@@ -558,8 +558,8 @@
                       </div>
                     </div>
 
-                    <!-- 3-Way Recast Comparison (Skipped when no qualified draft) -->
-                    <div v-if="msg.pipelineState.stage2.initial_champion !== '无合格初稿' && msg.pipelineState.stage2.recast_variants && (msg.pipelineState.stage2.recast_variants.monologue || msg.pipelineState.stage2.recast_variants.quantified || msg.pipelineState.stage2.recast_variants.cold_sketch)" class="bg-emerald-50/70 border border-emerald-200/80 rounded-lg p-2 space-y-1.5 text-[11px]">
+                    <!-- 3-Way Recast Comparison (Only shown when recast occurred) -->
+                    <div v-if="msg.pipelineState.stage2.recast_variants && (msg.pipelineState.stage2.recast_variants.monologue || msg.pipelineState.stage2.recast_variants.quantified || msg.pipelineState.stage2.recast_variants.cold_sketch)" class="bg-emerald-50/70 border border-emerald-200/80 rounded-lg p-2 space-y-1.5 text-[11px]">
                       <div class="font-bold text-emerald-950 flex items-center justify-between">
                         <span>三向句式打磨对比</span>
                         <span class="text-[10px] text-emerald-700">锁死器物与核心事件</span>
@@ -612,9 +612,9 @@
                         </div>
                       </div>
                     </div>
-                    <div v-else-if="msg.pipelineState.stage2.initial_champion === '无合格初稿'" class="bg-gray-50 border border-dashed border-gray-300 rounded-lg p-2 text-[10px] text-gray-500 flex items-center justify-between">
-                      <span class="font-semibold text-gray-600">初稿未达标</span>
-                      <span>三轨候选均未通过四关检视，已自动跳过打磨重铸</span>
+                    <div v-else class="bg-amber-50/80 border border-dashed border-amber-300 rounded-lg p-2 text-[10px] text-amber-900 flex items-center justify-between">
+                      <span class="font-semibold text-amber-800">未达到高质量初稿标准</span>
+                      <span>已跳过二次打磨，优选相对最佳初稿直出为冠军金句</span>
                     </div>
 
                     <!-- Crowning Reason -->
@@ -2115,23 +2115,23 @@
 4. 末词遮蔽关（Ochi）：遮住最后2~4个字若已泄光包袱直接判死。
 
 【死斗与重铸规则】
-1. 按「落差高度 × 回收利落度」两两质询，决出总冠军初稿。
-2. 【关键安全红线】：如果三轨所有候选均未通过四关检视（全都平庸、脱离原题或像公文），初稿直接填 "无合格初稿"！此时严禁进行任何句法打磨重铸，recast_variants 必须设为 null！
-3. 仅当存在合格初稿时，才牢牢锁死【原题器物与核心事件】，用3种代数句法公式重铸（12~20字自然白话、零标点空格、底词右置）：
+1. 按「落差高度 × 回收利落度」两两质询，决出总冠军初稿 initial_champion。即便全场瑕疵较多，也必须矮子里面拔高个，选出一句相对最通顺、最切合原题的候选作为初稿，绝不交白卷！
+2. 【关键安全红线】：如果选出的初稿未能达到高水平（例如平庸、概念有些生硬或生活呼吸感不足），【必须跳过打磨重铸】，将 recast_variants 设为 null，严禁强行硬套公式生搬硬造！final_champion 直接采用该相对最佳初稿！
+3. 仅当初稿品质真正过硬达标时，才牢牢锁死【原题器物与核心事件】，用3种代数句法公式重铸（12~20字自然白话、零标点空格、底词右置）：
    - [现场喝止/独白体]：[70% 正常操作原题器物的前置指令] + [30% 暴露前提误解的突发末词]
    - [量化规矩/折算体]：[70% 原题正常器物与动作] + 超/每 [具体刻度] + [30% 荒谬计价或离谱后果]
    - [冷面白描/单动作体]：[70% 场内角色 + 操作原题单一器物] + [30% 错位核心动词与底词]
-4. 若初稿为 "无合格初稿"，final_champion 直接填 "无合格初稿"；若有合格重铸，选出画面最脆的一句作为 final_champion。
+   若有打磨，与初稿同台对决选出画面最脆的一句作为 final_champion。
 
 请输出合法 JSON：
 {
   "four_gate_eliminations": ["淘汰理由清单"],
   "duel_records": "公诉人两两死斗质询过程与轨道冠军决选",
   "track_champions": {"trackA": "A轨最佳句", "trackB": "B轨最佳句", "trackC": "C轨最佳句"},
-  "initial_champion": "总冠军初稿句（若全灭则填'无合格初稿'）",
+  "initial_champion": "相对最佳初稿短句（必填，绝不留空）",
   "recast_variants": {"monologue": "现场喝止体重铸句", "quantified": "量化规矩体重铸句", "cold_sketch": "冷面白描体重铸句"} 或 null,
-  "final_champion": "最终全场总冠军金句（若初稿不合格则填'无合格初稿'）",
-  "crowning_reason": "加冕判词或淘汰说明"
+  "final_champion": "最终全场总冠军金句（必填12~20字自然白话，无优质打磨则直接取初稿）",
+  "crowning_reason": "加冕判词与打磨取舍说明"
 }`;
 
             const stage2UserPrompt = `【大喜利原题】: ${promptText || '看图大喜利'}\n候选短句池：\n${allCandidates.join('\n')}\n请对照原题严苛审判并产出全新冠军金句！`;
@@ -2142,11 +2142,18 @@
             });
             const parsedS2 = parseJsonSafely(s2Reply);
 
-            const initialCleaned = cleanPunchline(parsedS2.initial_champion) || '';
-            const isUnqualified = !initialCleaned || initialCleaned === '无合格初稿' || initialCleaned.includes('无合格') || initialCleaned.includes('全灭');
+            // Extract initial champion & track candidates for fallback
+            let initialCleaned = cleanPunchline(parsedS2.initial_champion) || '';
+            if (!initialCleaned || initialCleaned === '无合格初稿' || initialCleaned.includes('无合格') || initialCleaned.includes('全灭')) {
+              initialCleaned = cleanPunchline(parsedS2.track_champions?.trackA) 
+                || cleanPunchline(parsedS2.track_champions?.trackB) 
+                || cleanPunchline(parsedS2.track_champions?.trackC) 
+                || (allCandidates.length ? cleanPunchline(allCandidates[0]) : '') 
+                || '大喜利新金句';
+            }
 
             let finalRecastVariants = null;
-            if (!isUnqualified && parsedS2.recast_variants) {
+            if (parsedS2.recast_variants && (parsedS2.recast_variants.monologue || parsedS2.recast_variants.quantified || parsedS2.recast_variants.cold_sketch)) {
               finalRecastVariants = {
                 monologue: cleanPunchline(parsedS2.recast_variants.monologue) || '',
                 quantified: cleanPunchline(parsedS2.recast_variants.quantified) || '',
@@ -2159,19 +2166,17 @@
               duel_records: parsedS2.duel_records || '',
               pk_interrogation: parsedS2.pk_interrogation || parsedS2.duel_records || '',
               track_champions: parsedS2.track_champions || {},
-              initial_champion: isUnqualified ? '无合格初稿' : initialCleaned,
+              initial_champion: initialCleaned,
               recast_variants: finalRecastVariants,
               crowning_reason: parsedS2.crowning_reason || ''
             };
 
-            const newChampion = isUnqualified 
-              ? '无合格初稿' 
-              : (cleanPunchline(parsedS2.final_champion)
-                || cleanPunchline(finalRecastVariants?.cold_sketch)
-                || cleanPunchline(finalRecastVariants?.monologue)
-                || cleanPunchline(finalRecastVariants?.quantified)
-                || initialCleaned
-                || '大喜利新金句');
+            const newChampion = cleanPunchline(parsedS2.final_champion)
+              || cleanPunchline(finalRecastVariants?.cold_sketch)
+              || cleanPunchline(finalRecastVariants?.monologue)
+              || cleanPunchline(finalRecastVariants?.quantified)
+              || initialCleaned
+              || '大喜利新金句';
 
             playerMsg.champion = newChampion;
 
@@ -3435,13 +3440,13 @@
 4. 末词遮蔽关（Ochi）：遮住最后2~4个字若已泄光包袱直接判死。
 
 【死斗与重铸规则】
-1. 按「落差高度 × 回收利落度」两两质询，决出总冠军初稿。
-2. 【关键安全红线】：如果三轨所有候选均未通过四关检视（全都平庸、脱离原题或像公文拼盘），初稿直接填 "无合格初稿"！此时严禁进行任何句法打磨重铸，recast_variants 必须设为 null！
-3. 仅当存在合格初稿时，才牢牢锁死【原题器物与核心事件】，用3种代数句法公式重铸（12~20字自然白话、零标点空格、底词右置）：
+1. 按「落差高度 × 回收利落度」两两质询，决出总冠军初稿 initial_champion。即便全场瑕疵较多，也必须矮子里面拔高个，选出一句相对最通顺、最切合原题的候选作为初稿，绝不交白卷！
+2. 【关键安全红线】：如果选出的初稿未能达到高水平（例如平庸、概念有些生硬或生活呼吸感不足），【必须跳过打磨重铸】，将 recast_variants 设为 null，严禁强行硬套公式生搬硬造！final_champion 直接采用该相对最佳初稿！
+3. 仅当初稿品质真正过硬达标时，才牢牢锁死【原题器物与核心事件】，用3种代数句法公式重铸（12~20字自然白话、零标点空格、底词右置）：
    - [现场喝止/当事人独白体]：[70% 正常操作原题器物的前置指令] + [30% 暴露前提误解的突发末词]
    - [量化规矩/折算体]：[70% 原题正常器物与动作] + 超/每 [具体刻度] + [30% 荒谬计价或离谱后果]
    - [冷面白描/单动作体]：[70% 场内角色 + 操作原题单一器物] + [30% 错位核心动词与底词]
-4. 若初稿为 "无合格初稿"，final_champion 直接填 "无合格初稿"；若有合格重铸，与初稿同台对决选出画面最脆的一句作为 final_champion。
+   若有打磨，与初稿同台对决选出画面最脆的一句作为 final_champion。
 
 请输出合法 JSON：
 {
@@ -3455,14 +3460,14 @@
     "trackB": "B轨最佳短句",
     "trackC": "C轨最佳短句"
   },
-  "initial_champion": "总冠军初稿短句（若全灭则填'无合格初稿'）",
+  "initial_champion": "相对最佳初稿短句（必填，绝不留空）",
   "recast_variants": {
     "monologue": "现场喝止独白体重铸句",
     "quantified": "量化规矩折算体重铸句",
     "cold_sketch": "冷面白描单动作体重铸句"
   } 或 null,
-  "final_champion": "最终全场总冠军金句（若初稿不合格则填'无合格初稿'）",
-  "crowning_reason": "加冕判词说明"
+  "final_champion": "最终全场总冠军金句（必填12~20字自然白话，无优质打磨则直接取初稿）",
+  "crowning_reason": "加冕判词与打磨取舍说明"
 }
 只输出 JSON。`;
 
@@ -3474,11 +3479,19 @@
             });
 
             const parsedS2 = parseJsonSafely(stage2Reply);
-            const initialCleaned = cleanPunchline(parsedS2.initial_champion) || '';
-            const isUnqualified = !initialCleaned || initialCleaned === '无合格初稿' || initialCleaned.includes('无合格') || initialCleaned.includes('全灭');
+
+            // Extract initial champion & track candidates for fallback
+            let initialCleaned = cleanPunchline(parsedS2.initial_champion) || '';
+            if (!initialCleaned || initialCleaned === '无合格初稿' || initialCleaned.includes('无合格') || initialCleaned.includes('全灭')) {
+              initialCleaned = cleanPunchline(parsedS2.track_champions?.trackA) 
+                || cleanPunchline(parsedS2.track_champions?.trackB) 
+                || cleanPunchline(parsedS2.track_champions?.trackC) 
+                || (allCandidates.length ? cleanPunchline(allCandidates[0]) : '') 
+                || '大喜利金句生成完毕';
+            }
 
             let finalRecastVariants = null;
-            if (!isUnqualified && parsedS2.recast_variants) {
+            if (parsedS2.recast_variants && (parsedS2.recast_variants.monologue || parsedS2.recast_variants.quantified || parsedS2.recast_variants.cold_sketch)) {
               finalRecastVariants = {
                 monologue: cleanPunchline(parsedS2.recast_variants.monologue) || parsedS2.recast_variants.monologue || '',
                 quantified: cleanPunchline(parsedS2.recast_variants.quantified) || parsedS2.recast_variants.quantified || '',
@@ -3493,20 +3506,18 @@
               duel_records: parsedS2.duel_records || parsedS2.pk_interrogation || '',
               pk_interrogation: parsedS2.pk_interrogation || parsedS2.duel_records || '',
               track_champions: parsedS2.track_champions || {},
-              initial_champion: isUnqualified ? '无合格初稿' : initialCleaned,
+              initial_champion: initialCleaned,
               recast_variants: finalRecastVariants,
               crowning_reason: parsedS2.crowning_reason || ''
             };
 
             // Clean champion: strictly strip accidental labels/quotes/punctuation, ensuring 100% preservation of punchline words
-            let cleanedChampion = isUnqualified 
-              ? '无合格初稿' 
-              : (cleanPunchline(parsedS2.final_champion)
-                || cleanPunchline(finalRecastVariants?.cold_sketch)
-                || cleanPunchline(finalRecastVariants?.monologue)
-                || cleanPunchline(finalRecastVariants?.quantified)
-                || initialCleaned
-                || '大喜利金句生成完毕');
+            let cleanedChampion = cleanPunchline(parsedS2.final_champion)
+              || cleanPunchline(finalRecastVariants?.cold_sketch)
+              || cleanPunchline(finalRecastVariants?.monologue)
+              || cleanPunchline(finalRecastVariants?.quantified)
+              || initialCleaned
+              || '大喜利金句生成完毕';
 
             playerMsg.champion = cleanedChampion;
 
