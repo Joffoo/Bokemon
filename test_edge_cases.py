@@ -105,8 +105,10 @@ async def run_edge_tests():
             const r3 = fn("考勤机：只录入下跪姿态");
             // Test D: Style tag prefix
             const r4 = fn("[冷面白描体] 晨会脱鞋检查鞋垫含税率");
-            // Test E: Over 20 characters truncation
+            // Test E: Over 20 characters preservation without arbitrary truncation
             const r5 = fn("这是一条超级超级超级超级超级长的大喜利句子测试");
+            const directFn = window.cleanDirectReply;
+            const rDirect = directFn ? directFn("“领唱翻开校歌本找今天的菜单，竟然全是荤菜！”") : "";
             // Test F: Natural vernacular prepositions and particles preservation
             const r6 = fn("【现场体】投完香火钱，站在莲花台前等找零！");
             // Test G: Leading numbered list or markdown bullet
@@ -120,7 +122,8 @@ async def run_edge_tests():
               r2, r2Valid: r2 === "起身去厕所先刷ETC",
               r3, r3Valid: r3 === "考勤机只录入下跪姿态",
               r4, r4Valid: r4 === "晨会脱鞋检查鞋垫含税率",
-              r5Len: r5.length, r5Valid: r5.length <= 20,
+              r5Len: r5.length, r5Valid: r5.length === 23, // 100% full sentence preserved, no 20-char truncation
+              rDirectValid: rDirect === "领唱翻开校歌本找今天的菜单，竟然全是荤菜！",
               r6, r6Valid: r6 === "投完香火钱站在莲花台前等找零",
               r7, r7Valid: r7 === "主唱跳水台下全是队友",
               r8, r8Valid: r8 === "拍拍莲花座示意佛祖往里挪",
@@ -131,7 +134,8 @@ async def run_edge_tests():
         assert clean_punchline_test["r2Valid"], f"Test B (Japanese quotes) failed: {clean_punchline_test['r2']}"
         assert clean_punchline_test["r3Valid"], f"Test C (Colon subject preservation) failed: {clean_punchline_test['r3']}"
         assert clean_punchline_test["r4Valid"], f"Test D (Style tag) failed: {clean_punchline_test['r4']}"
-        assert clean_punchline_test["r5Valid"], f"Test E (Truncation <=20) failed: {clean_punchline_test['r5Len']}"
+        assert clean_punchline_test["r5Valid"], f"Test E (No truncation) failed: {clean_punchline_test['r5Len']}"
+        assert clean_punchline_test["rDirectValid"], f"Direct mode reply failed: {clean_punchline_test}"
         assert clean_punchline_test["r6Valid"], f"Test F (Vernacular prepositions) failed: {clean_punchline_test['r6']}"
         assert clean_punchline_test["r7Valid"], f"Test G (Numbered list) failed: {clean_punchline_test['r7']}"
         assert clean_punchline_test["r8Valid"], f"Test G2 (Markdown bullet) failed: {clean_punchline_test['r8']}"

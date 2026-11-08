@@ -289,56 +289,83 @@
 
             <!-- RUNNING / PIPELINE PROGRESS CARD (If generating) -->
             <div v-if="msg.isGenerating" class="w-full max-w-md bg-white border border-wechat-border rounded-xl p-3.5 shadow-sm text-xs space-y-3 mb-2">
-              <div class="flex items-center justify-between border-b border-gray-100 pb-2">
-                <span class="font-bold text-gray-800 flex items-center space-x-1.5">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                  <span>正在构思大喜利回答...</span>
-                </span>
-                <span class="text-[11px] text-emerald-600 font-semibold px-2 py-0.5 rounded bg-emerald-50">
-                  {{ msg.pipelineState.currentStageName }}
-                </span>
-              </div>
-
-              <!-- Pipeline Stepper Status -->
-              <div class="grid grid-cols-3 gap-2 text-center text-[11px]">
-                <!-- Step 0 -->
-                <div :class="['p-2 rounded-lg border transition', msg.pipelineState.currentStage >= 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-400']">
-                  <div class="font-bold">1. 审题分析</div>
-                  <div class="text-[10px] mt-0.5">{{ msg.pipelineState.currentStage > 0 ? '✓ 常识已拆解' : (msg.pipelineState.currentStage === 0 ? '分析题面中...' : '等待开始') }}</div>
+              
+              <!-- Direct Mode Generating State (Single-Shot Prompt, No Multi-Agent Pipeline) -->
+              <div v-if="!msg.pipelineState" class="space-y-2.5">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                  <span class="font-bold text-gray-800 flex items-center space-x-1.5">
+                    <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+                    <span class="text-xs">正在快速构思大喜利回答...</span>
+                  </span>
+                  <span class="text-[11px] text-amber-700 font-semibold px-2 py-0.5 rounded bg-amber-50 border border-amber-200 shrink-0">
+                    🚀 极简模式
+                  </span>
                 </div>
 
-                <!-- Step 1 -->
-                <div :class="['p-2 rounded-lg border transition', msg.pipelineState.currentStage >= 1 ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-400']">
-                  <div class="font-bold">2. 多向构思</div>
-                  <div class="text-[10px] mt-0.5">{{ msg.pipelineState.currentStage > 1 ? '✓ 脑洞已生成' : (msg.pipelineState.currentStage === 1 ? '多路发散中...' : '等待审题') }}</div>
-                </div>
-
-                <!-- Step 2 -->
-                <div :class="['p-2 rounded-lg border transition', msg.pipelineState.currentStage >= 2 ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-400']">
-                  <div class="font-bold">3. 推敲选优</div>
-                  <div class="text-[10px] mt-0.5">{{ msg.pipelineState.currentStage >= 3 ? '✓ 最佳已选出' : (msg.pipelineState.currentStage === 2 ? '比对筛选中...' : '等待候选') }}</div>
+                <div class="py-2.5 px-3 bg-amber-50/60 rounded-lg border border-amber-200/50 flex items-center space-x-2.5 text-gray-600">
+                  <svg class="animate-spin h-4 w-4 text-amber-600 shrink-0" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+                  </svg>
+                  <span class="text-[11px] leading-relaxed">
+                    跳过审题与多轨裁决，大模型直接构思幽默回答中...
+                  </span>
                 </div>
               </div>
 
-              <!-- Subagent Concurrency & Retry Status Pill -->
-              <div v-if="msg.pipelineState.currentStage === 1" class="space-y-1.5 pt-1">
-                <div class="flex items-center justify-between text-[11px] text-gray-600 bg-gray-50 px-2 py-1 rounded">
-                  <span class="font-medium">角度一：生活破绽</span>
-                  <span :class="getStatusBadgeClass(msg.pipelineState.trackA.status)">
-                    {{ getStatusText(msg.pipelineState.trackA) }}
+              <!-- Workflow Mode Multi-Stage Progress Stepper -->
+              <div v-else class="space-y-3">
+                <div class="flex items-center justify-between border-b border-gray-100 pb-2">
+                  <span class="font-bold text-gray-800 flex items-center space-x-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
+                    <span>正在构思大喜利回答...</span>
+                  </span>
+                  <span class="text-[11px] text-emerald-600 font-semibold px-2 py-0.5 rounded bg-emerald-50">
+                    {{ msg.pipelineState.currentStageName }}
                   </span>
                 </div>
-                <div class="flex items-center justify-between text-[11px] text-gray-600 bg-gray-50 px-2 py-1 rounded">
-                  <span class="font-medium">角度二：职业动作</span>
-                  <span :class="getStatusBadgeClass(msg.pipelineState.trackB.status)">
-                    {{ getStatusText(msg.pipelineState.trackB) }}
-                  </span>
+
+                <!-- Pipeline Stepper Status -->
+                <div class="grid grid-cols-3 gap-2 text-center text-[11px]">
+                  <!-- Step 0 -->
+                  <div :class="['p-2 rounded-lg border transition', msg.pipelineState.currentStage >= 0 ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-400']">
+                    <div class="font-bold">1. 审题分析</div>
+                    <div class="text-[10px] mt-0.5">{{ msg.pipelineState.currentStage > 0 ? '✓ 常识已拆解' : (msg.pipelineState.currentStage === 0 ? '分析题面中...' : '等待开始') }}</div>
+                  </div>
+
+                  <!-- Step 1 -->
+                  <div :class="['p-2 rounded-lg border transition', msg.pipelineState.currentStage >= 1 ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-400']">
+                    <div class="font-bold">2. 多向构思</div>
+                    <div class="text-[10px] mt-0.5">{{ msg.pipelineState.currentStage > 1 ? '✓ 脑洞已生成' : (msg.pipelineState.currentStage === 1 ? '多路发散中...' : '等待审题') }}</div>
+                  </div>
+
+                  <!-- Step 2 -->
+                  <div :class="['p-2 rounded-lg border transition', msg.pipelineState.currentStage >= 2 ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-gray-50 border-gray-200 text-gray-400']">
+                    <div class="font-bold">3. 推敲选优</div>
+                    <div class="text-[10px] mt-0.5">{{ msg.pipelineState.currentStage >= 3 ? '✓ 最佳已选出' : (msg.pipelineState.currentStage === 2 ? '比对筛选中...' : '等待候选') }}</div>
+                  </div>
                 </div>
-                <div class="flex items-center justify-between text-[11px] text-gray-600 bg-gray-50 px-2 py-1 rounded">
-                  <span class="font-medium">角度三：物理极限</span>
-                  <span :class="getStatusBadgeClass(msg.pipelineState.trackC.status)">
-                    {{ getStatusText(msg.pipelineState.trackC) }}
-                  </span>
+
+                <!-- Subagent Concurrency & Retry Status Pill -->
+                <div v-if="msg.pipelineState.currentStage === 1" class="space-y-1.5 pt-1">
+                  <div class="flex items-center justify-between text-[11px] text-gray-600 bg-gray-50 px-2 py-1 rounded">
+                    <span class="font-medium">角度一：生活破绽</span>
+                    <span :class="getStatusBadgeClass(msg.pipelineState.trackA.status)">
+                      {{ getStatusText(msg.pipelineState.trackA) }}
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] text-gray-600 bg-gray-50 px-2 py-1 rounded">
+                    <span class="font-medium">角度二：职业动作</span>
+                    <span :class="getStatusBadgeClass(msg.pipelineState.trackB.status)">
+                      {{ getStatusText(msg.pipelineState.trackB) }}
+                    </span>
+                  </div>
+                  <div class="flex items-center justify-between text-[11px] text-gray-600 bg-gray-50 px-2 py-1 rounded">
+                    <span class="font-medium">角度三：物理极限</span>
+                    <span :class="getStatusBadgeClass(msg.pipelineState.trackC.status)">
+                      {{ getStatusText(msg.pipelineState.trackC) }}
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -357,7 +384,7 @@
                   <span>全场总冠军金句</span>
                 </div>
                 <span class="text-[10px] bg-white/70 px-1.5 py-0.5 rounded font-mono text-emerald-800">
-                  {{ msg.champion.length }}字 · 零标点
+                  {{ msg.champion.length }}字{{ /[，。！？、：；“”‘’"'\s]/.test(msg.champion) ? '' : ' · 零标点' }}
                 </span>
               </div>
 
@@ -1144,7 +1171,23 @@
       }
     }
 
-    // Universal Punchline Sanitizer (fixes quotation/colon bugs and enforces <=20 chars natural vernacular)
+    // Dedicated Direct-Mode Reply Sanitizer (preserves complete natural punctuation and sentence without truncation)
+    function cleanDirectReply(raw) {
+      if (!raw || typeof raw !== 'string') return '';
+      let s = raw.trim();
+      s = s.replace(/^```[\s\S]*?\n/, '').replace(/\n```$/, '');
+      const lines = s.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
+      if (lines.length > 0) s = lines[0];
+      s = s.replace(/^[\s\*\-•—–]+\s*/, '');
+      s = s.replace(/^(?:\d+|[a-zA-Z])[\.、\)）]\s*/, '');
+      s = s.replace(/^(?:回答|大喜利|金句|台词|吐槽)[：:\s\-—]*/i, '');
+      s = s.replace(/^[「“"『《\s]+|[」”"』》\s]+$/g, '');
+      s = s.replace(/[。\.]$/, '');
+      return s.length > 80 ? s.slice(0, 80) : s;
+    }
+    window.cleanDirectReply = cleanDirectReply;
+
+    // Universal Punchline Sanitizer (fixes quotation/colon bugs and preserves full natural punchlines up to 80 chars)
     function cleanPunchline(raw) {
       if (!raw || typeof raw !== 'string') return '';
       let s = raw.trim();
@@ -1170,7 +1213,7 @@
 
       // Strip internal punctuation and symbols
       s = s.replace(/[，。！？、：；“”‘’\"\'\`\s\(\)（）\[\]【】《》「」『』—\-_\*•\+\/\\]/g, '');
-      return s.slice(0, 20);
+      return s.length > 80 ? s.slice(0, 80) : s;
     }
     window.cleanPunchline = cleanPunchline;
 
@@ -1913,6 +1956,46 @@
           isGeneratingAny.value = true;
           playerMsg.isGenerating = true;
           playStartSound();
+
+          // Handle Direct Mode reroll (no pipelineState)
+          if (!playerMsg.pipelineState) {
+            try {
+              if (!config.apiKey) {
+                await new Promise(r => setTimeout(r, 600));
+                const mockDirects = [
+                  "领唱翻开校歌本找今天的菜单",
+                  "起调直接飙到帕瓦罗蒂的高音G",
+                  "台下突然全体起立开始鼓掌",
+                  "张嘴唱出了隔壁学校的校歌"
+                ];
+                playerMsg.champion = mockDirects[Math.floor(Math.random() * mockDirects.length)];
+              } else {
+                const directSystemPrompt = `请对下面的大喜利题目给出一句幽默搞笑的回答，只输出这一句话本身。`;
+                const reply = await callLlmWithBackoff({
+                  systemPrompt: directSystemPrompt,
+                  userPrompt: (promptText || `请给出一句幽默大喜利回答`) + ` (请换一个完全不同、更具意外感的全新脑洞角度)`,
+                  imageBase64: imgUrl
+                });
+                playerMsg.champion = cleanDirectReply(reply) || cleanPunchline(reply) || '大喜利金句生成完毕';
+              }
+              if (imgUrl) {
+                try {
+                  const memeUrl = await renderCanvasMeme(imgUrl, playerMsg.champion);
+                  playerMsg.memeDataUrl = memeUrl;
+                } catch (e) {}
+              }
+              playChampionSound();
+              showToast('🎲 已换角度重新构思出金句！');
+            } catch (err) {
+              console.error('Direct reroll error:', err);
+              showToast('重新构思异常：' + err.message);
+            } finally {
+              playerMsg.isGenerating = false;
+              isGeneratingAny.value = false;
+              scrollToBottom();
+            }
+            return;
+          }
 
           // Reuse existing stage 0 telemetry
           const s0 = playerMsg.pipelineState?.stage0 || {
@@ -3272,7 +3355,7 @@
                 imageBase64: img
               });
 
-              const cleaned = cleanPunchline(reply) || '大喜利金句生成完毕';
+              const cleaned = cleanDirectReply(reply) || cleanPunchline(reply) || '大喜利金句生成完毕';
               playerMsg.champion = cleaned;
 
               if (img) {
@@ -3668,6 +3751,7 @@
           crownManualVariant,
           rerollPunchline,
           cleanPunchline,
+          cleanDirectReply,
           sharePosterModal,
           openSharePosterModal,
           downloadSharePoster,
