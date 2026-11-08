@@ -1,0 +1,1 @@
+[{"id": 1, "prompt": "帮我生成一张 Obsidian 库的知识地图，用达·芬奇手稿风格，保存在桌面。", "expected": "识别出库路径、桌面路径、风格参数并启动 Phase 1"}, {"id": 2, "prompt": "我想看看我的笔记地形图，库在 E:\\OBVault\\Nexus，模型在 C:\\Models\\jina-embeddings-v2-base-en，用当代艺术风格。", "expected": "正确解析所有参数并直接启动 Phase 1"}]

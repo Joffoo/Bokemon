@@ -1,0 +1,162 @@
+[
+  {
+    "id": "T01",
+    "type": "text",
+    "prompt": "妈妈和魔术师出轨了，你是怎么发现的？"
+  },
+  {
+    "id": "T02",
+    "type": "text",
+    "prompt": "史上首个 130 人组成的摇滚乐队解散，理由是什么？"
+  },
+  {
+    "id": "T03",
+    "type": "text",
+    "prompt": "每 8 秒发生一次的是什么行为？"
+  },
+  {
+    "id": "T04",
+    "type": "text",
+    "prompt": "拍马屁的忍者对前辈忍者说了什么？"
+  },
+  {
+    "id": "T05",
+    "type": "text",
+    "prompt": "俗话说佛也有三次好脾气，第一次见面就把佛惹火的行为是什么？"
+  },
+  {
+    "id": "T06",
+    "type": "text",
+    "prompt": "精通 SM 的传说女王大人最终领悟的终极辱骂台词是什么？"
+  },
+  {
+    "id": "T07",
+    "type": "text",
+    "prompt": "全国最轻浮的高中，他们的校歌第一句是什么？"
+  },
+  {
+    "id": "T08",
+    "type": "text",
+    "prompt": "拳击比赛里，让人一眼看出“这家伙完全没有想赢的打算”，为什么？"
+  },
+  {
+    "id": "T09",
+    "type": "text",
+    "prompt": "去参加驾校或者单位面试时，一秒就让人决定“绝对不能录用”的发言是什么？"
+  },
+  {
+    "id": "T10",
+    "type": "text",
+    "prompt": "急救车明明一路拉着警报狂奔，但路人一眼就看出来“这绝对不是去救人的”，为什么？"
+  },
+  {
+    "id": "T11",
+    "type": "text",
+    "prompt": "一家号称“绝对让顾客流泪”的高级日料店，结账时却让客人彻底傻眼，发生了什么？"
+  },
+  {
+    "id": "T12",
+    "type": "text",
+    "prompt": "监考老师在考场里突然做出了什么动作，让全考场学生瞬间做不下题了？"
+  },
+  {
+    "id": "T13",
+    "type": "text",
+    "prompt": "公交车司机突然踩了急刹车，拿起喇叭对全车人说的一句话让大家都沉默了，是什么？"
+  },
+  {
+    "id": "T14",
+    "type": "text",
+    "prompt": "世界上最短的一封情书，内容是什么？"
+  },
+  {
+    "id": "T15",
+    "type": "text",
+    "prompt": "世界上最无用的发明是什么？"
+  },
+  {
+    "id": "T16",
+    "type": "text",
+    "prompt": "“点心糖果之国”到底是一个什么样的地方？"
+  },
+  {
+    "id": "T17",
+    "type": "text",
+    "prompt": "一眼就能看出来的“极度贫穷”是什么样子的？"
+  },
+  {
+    "id": "T18",
+    "type": "text",
+    "prompt": "走进一家收费高昂的男士洗浴中心，刚进包厢技师说出的第一句话就让你彻底清醒了，是什么？"
+  },
+  {
+    "id": "T19",
+    "type": "text",
+    "prompt": "一对情侣第一次去情趣酒店，前台大妈给钥匙时随口附带的一句温馨提示是什么？"
+  },
+  {
+    "id": "T20",
+    "type": "text",
+    "prompt": "相亲对象在个人资料里写着“擅长床上运动”，实际见面后你才发现他指的是什么？"
+  },
+  {
+    "id": "P01",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P01_45570881.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P02",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P02_79214400.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P03",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P03_42403144.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P04",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P04_74218276.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P05",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P05_52795088.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P06",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P06_68201370.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P07",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P07_44155992.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P08",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P08_43028476.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P09",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P09_60378851.jpg",
+    "prompt": "【看图大喜利】给这张照片配一句最精准的日式大喜利吐槽。"
+  },
+  {
+    "id": "P10",
+    "type": "image",
+    "image_path": "_attachments/oogiri_benchmark/P10_ai_funeral.jpg",
+    "prompt": "【看图大喜利】AI活用のスマート葬式 その驚きの特徴とは？（AI 智能葬礼到底有什么惊人特征？）"
+  }
+]
