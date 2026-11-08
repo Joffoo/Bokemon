@@ -200,6 +200,16 @@
 
         <div class="h-4 w-px bg-gray-300 mx-0.5"></div>
 
+        <!-- Mode Toggle Switch: Pipeline Workflow vs Direct Single-Shot Prompt -->
+        <button 
+          @click="pipelineMode = (pipelineMode === 'workflow' ? 'direct' : 'workflow')"
+          class="px-2 py-0.5 rounded-full text-[11px] font-semibold transition active:scale-95 cursor-pointer flex items-center space-x-1 border"
+          :class="pipelineMode === 'workflow' ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'"
+          :title="pipelineMode === 'workflow' ? '当前模式：4段多Agent深度工作流（点击切换为单次极简模式）' : '当前模式：极简单次提示词直出模式（点击切换回4段多Agent工作流）'"
+        >
+          <span>{{ pipelineMode === 'workflow' ? '⚡ 完整工作流' : '🚀 极简直出' }}</span>
+        </button>
+
         <!-- Sound Effect Toggle (Web Audio) -->
         <button 
           @click="toggleSound" 
@@ -1213,6 +1223,11 @@
         const inputText = ref('');
         const selectedImage = ref(null);
         const isGeneratingAny = ref(false);
+        const pipelineMode = ref(localStorage.getItem('bokemon_pipeline_mode') || 'workflow');
+
+        watch(pipelineMode, (val) => {
+          try { localStorage.setItem('bokemon_pipeline_mode', val); } catch(e){}
+        });
 
         // Modals & UI States
         const showSettingsModal = ref(false);
@@ -3231,6 +3246,64 @@
             imageDataUrl: img
           });
 
+          // DIRECT MODE BRANCH (Single Prompt, No Workflow)
+          if (pipelineMode.value === 'direct') {
+            const playerMsg = reactive({
+              id: Date.now() + 1,
+              time: timeStr,
+              showTime: false,
+              role: 'player',
+              isGenerating: true,
+              champion: '',
+              memeDataUrl: null,
+              expandedDetails: false,
+              pipelineState: null // No multi-stage pipeline state
+            });
+
+            messages.value.push(playerMsg);
+            scrollToBottom();
+
+            try {
+              const directSystemPrompt = `你是一名日本顶级大喜利（Oogiri）选手。
+核心法则：70% 真实日常常识地基 + 30% 单点意外错位。
+请针对命题给出1句让人拍案叫绝、秒懂幽默的大喜利金句。
+规范要求：
+1. 语态对齐：问台词/歌词直接回答第一人称台词本身，问行为/现象直接回答客观事实。
+2. 长度：12~20字纯自然大白话，禁止公文腔与概念拼凑。
+3. 结构：纯汉字数字，零标点符号，零空格，将最核心的包袱底词置于句末。
+直接输出这唯一一句大喜利金句，严禁包含任何前缀、引号或解释说明。`;
+
+              const reply = await callLlmWithBackoff({
+                systemPrompt: directSystemPrompt,
+                userPrompt: text || `请根据图片做一句极品大喜利回答`,
+                imageBase64: img
+              });
+
+              const cleaned = cleanPunchline(reply) || '大喜利金句生成完毕';
+              playerMsg.champion = cleaned;
+
+              if (img) {
+                try {
+                  const memeUrl = await renderCanvasMeme(img, cleaned);
+                  playerMsg.memeDataUrl = memeUrl;
+                } catch (e) {}
+              }
+
+              playChampionSound();
+              showToast('🚀 极简模式：已秒出金句！');
+            } catch (err) {
+              console.error('Direct generation error:', err);
+              playerMsg.champion = '生成遇到异常：' + err.message;
+              showToast('生成异常：' + err.message);
+            } finally {
+              playerMsg.isGenerating = false;
+              isGeneratingAny.value = false;
+              scrollToBottom();
+            }
+            return;
+          }
+
+          // WORKFLOW MODE BRANCH (4-Stage Multi-Agent)
           // Append Player Placeholder
           const playerMsg = reactive({
             id: Date.now() + 1,
@@ -3552,6 +3625,7 @@
           inputText,
           selectedImage,
           isGeneratingAny,
+          pipelineMode,
           showSettingsModal,
           showPresetsModal,
           showApiKey,
