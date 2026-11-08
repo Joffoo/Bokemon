@@ -116,6 +116,10 @@ async def run_edge_tests():
             const r8 = fn("* 拍拍莲花座示意佛祖往里挪");
             // Test H: Track label prefix
             const r9 = fn("A轨(体面破绽)：调完第一百三十把吉他第一把又跑调了");
+            // Test I: Numbered secular domain leakage (e.g. 6民政婚姻登记 or [6] 民政婚姻登记)
+            const r10 = fn("6民政婚姻登记听完双方陈述后调解员职业性沉默等当事人先开口");
+            const r11 = fn("[6] 民政婚姻登记 听完双方陈述后调解员职业性沉默等当事人先开口");
+            const r12 = fn("【B轨异业动作】[6] 民政婚姻登记：听完双方陈述后调解员职业性沉默等当事人先开口");
 
             return {
               r1, r1Valid: r1 === "考勤机只录入下跪姿态",
@@ -127,7 +131,10 @@ async def run_edge_tests():
               r6, r6Valid: r6 === "投完香火钱站在莲花台前等找零",
               r7, r7Valid: r7 === "主唱跳水台下全是队友",
               r8, r8Valid: r8 === "拍拍莲花座示意佛祖往里挪",
-              r9, r9Valid: r9 === "调完第一百三十把吉他第一把又跑调了"
+              r9, r9Valid: r9 === "调完第一百三十把吉他第一把又跑调了",
+              r10Valid: r10 === "听完双方陈述后调解员职业性沉默等当事人先开口",
+              r11Valid: r11 === "听完双方陈述后调解员职业性沉默等当事人先开口",
+              r12Valid: r12 === "听完双方陈述后调解员职业性沉默等当事人先开口"
             };
         }""")
         assert clean_punchline_test["r1Valid"], f"Test A failed: {clean_punchline_test}"
@@ -140,6 +147,9 @@ async def run_edge_tests():
         assert clean_punchline_test["r7Valid"], f"Test G (Numbered list) failed: {clean_punchline_test['r7']}"
         assert clean_punchline_test["r8Valid"], f"Test G2 (Markdown bullet) failed: {clean_punchline_test['r8']}"
         assert clean_punchline_test["r9Valid"], f"Test H (Track label) failed: {clean_punchline_test['r9']}"
+        assert clean_punchline_test["r10Valid"], f"Test I1 (6民政婚姻登记 stripping) failed: {clean_punchline_test}"
+        assert clean_punchline_test["r11Valid"], f"Test I2 ([6] 民政婚姻登记 stripping) failed: {clean_punchline_test}"
+        assert clean_punchline_test["r12Valid"], f"Test I3 (Combined bracket & category stripping) failed: {clean_punchline_test}"
         print(f"✓ Edge Case 5: Comprehensive punchline sanitization verified (Quotes, Colons, Labels, Bullets, Lists, <=20 chars, Vernacular).")
 
         # 6. Edge Case: JSON parser handles trailing commas
