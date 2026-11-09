@@ -27,12 +27,12 @@ SECULAR_DOMAINS = [
 CONFIGS = {
     "gpt-6-astra": {
         "url": "https://api-direct.ccapi.us/v1/chat/completions",
-        "key": "sk-nPgTKIVp8foPX9cKrzVRDF7laoFpFDcMp0IFEpBhDCauUz9I",
+        "key": os.environ.get("CCAPI_KEY_GPT6", ""),
         "model": "gpt-6-astra"
     },
     "claude-opus-5-5": {
         "url": "https://api-direct.ccapi.us/v1/chat/completions",
-        "key": "sk-DnqNZhH9UWuPASo6e4PK28qoJippxWXtAmnElfTEMLNgimDF",
+        "key": os.environ.get("CCAPI_KEY_CLAUDE", ""),
         "model": "claude-opus-5-5"
     }
 }
@@ -183,12 +183,25 @@ def main():
     parser.add_argument("--model", choices=["gpt-6-astra", "claude-opus-5-5", "all"], default="all")
     args = parser.parse_args()
 
-    # Load benchmark dataset
-    benchmark_path = r"e:\OBVault\Nexus\.agents\skills\oogiri-flow\resources\benchmark_dataset.json"
+    # Load benchmark dataset（本地私有库，路径不进仓库：用环境变量提供）
+    benchmark_path = os.environ.get("OOGIRI_BENCHMARK_PATH", "")
+    if not benchmark_path or not os.path.isfile(benchmark_path):
+        raise SystemExit(
+            "缺少基准题库：请设置环境变量 OOGIRI_BENCHMARK_PATH 指向 benchmark_dataset.json"
+            "（位于本地 oogiri-flow skill 的 resources/ 目录）。"
+        )
     with open(benchmark_path, "r", encoding="utf-8") as f:
         items = json.load(f)[:10] # first 10 items (T01~T07, P01~P03)
 
     target_models = ["gpt-6-astra", "claude-opus-5-5"] if args.model == "all" else [args.model]
+
+    missing = [m for m in target_models if not CONFIGS[m]["key"]]
+    if missing:
+        raise SystemExit(
+            "缺少 API Key 环境变量：" + ", ".join(
+                {"gpt-6-astra": "CCAPI_KEY_GPT6", "claude-opus-5-5": "CCAPI_KEY_CLAUDE"}[m] for m in missing
+            ) + "\n请在 shell 里设置后重跑；本仓库是公开的，绝对不要把 key 写回这个文件。"
+        )
 
     for model_name in target_models:
         cfg = CONFIGS[model_name]

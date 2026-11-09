@@ -1,0 +1,6 @@
+{"id": "T01", "type": "text", "prompt": "停在三轮车上的共享单车"}
+{"id": "T02", "type": "text", "prompt": "一个很努力但完全没用的人"}
+{"id": "T03", "type": "text", "prompt": "开会开到一半想起家里煤气没关"}
+{"id": "P01", "type": "image", "prompt": "", "image_path": "images/p01.jpg"}
+{"id": "P02", "type": "image", "prompt": "", "image_path": "images/p02.jpg"}
+{"id": "P03", "type": "image", "prompt": "", "image_path": "images/p03.jpg"}

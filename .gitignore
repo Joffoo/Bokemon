@@ -63,3 +63,25 @@ desktop.ini
 .idea/
 *.swp
 *.swo
+
+# Secrets & local settings (repo is public — never commit keys)
+.env
+.env.*
+bench/ab-divergence/config.json
+
+# 私有内容与可再生成的实验中间物（个人题库/本机路径不进公开仓库）
+bench/ab-divergence/items.jsonl
+bench/ab-divergence/pilot.json
+bench/ab-divergence/ab_input.json
+bench/ab-divergence/ab_input.meta.json
+bench/ab-divergence/ab_tpl_*.txt
+bench/ab-divergence/baseline_prompts.json
+
+# Experiment raw artifacts (regenerable, may contain model output)
+bench/ab-divergence/runs*.jsonl
+bench/ab-divergence/judgements*.jsonl
+bench/ab-divergence/manifest.json
+bench/ab-divergence/summary.json
+bench/ab-divergence/shots/
+
+scratch_*.txt

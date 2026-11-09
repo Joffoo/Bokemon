@@ -69,6 +69,7 @@
      python -m http.server 8000
      ```
 3. **配置凭证**：点击右上角「⚙️ 设置」，填入您的兼容 API Key 与 Base URL 即可畅玩！
+4. **中转站不支持浏览器跨域（CORS）时**：双击 `启动.bat`（需已装 Python 3），会自动打开 `http://127.0.0.1:8787/`，然后照常在设置里填自己的 Base URL、API Key 和模型即可。页面会自动把跨域请求交给本机中转，转发目标就是你填的地址。中转只监听本机、只接受本机页面的请求，Key 只透传、不保存、不打印。
 
 ---
 
@@ -146,6 +147,23 @@ Users can supply their own LLM API credentials (BYOK mode, supporting OpenAI, Op
 | **Rendering & Canvas** | HTML5 Canvas API + [modern-screenshot](https://github.com/qq15725/modern-screenshot) |
 | **Architecture** | 100% Serverless, Static Single Page App (BYOK Pattern) |
 | **Testing Suite** | Python 3 + Playwright (Headless & Full Browser Acceptance) |
+
+### 🪝 Git Hooks / 提交钩子
+
+钩子放在 `.githooks/`（跟仓库一起走，不是只躺在 `.git/hooks` 里）。**首次检出后启用一次：**
+
+```bash
+git config core.hooksPath .githooks
+chmod +x .githooks/pre-commit    # 仅 macOS / Linux 需要
+```
+
+| Hook | 作用 |
+| :--- | :--- |
+| `pre-commit` | 拦截超过 **20 KB** 的源码文件，报错里给出按功能拆分的建议；跳过 lockfile、`*.min.*`、构建产物、文件头标了 `@generated` 的生成文件、图片字体 |
+
+文件一大，人和模型都很难一次读完，改动时容易只看到局部。已有的大文件登记在 `.githooks/size-baseline.txt`（如 `index.html`）：**不超过记录值仍可提交，一旦变大同样被拦**。拆分完成后请删掉对应行 —— 基线只降不升。
+
+临时绕过：`git commit --no-verify`。
 
 ---
 
