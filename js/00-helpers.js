@@ -110,8 +110,8 @@
     }
     window.cleanDirectReply = cleanDirectReply;
 
-    // Universal Punchline Sanitizer (fixes quotation/colon bugs and preserves full natural punchlines up to 80 chars)
-    function cleanPunchline(raw) {
+    // Universal Punchline Sanitizer (preserves natural punctuation and clean punchlines up to 120 chars)
+    function cleanPunchline(raw, stripAllPunctuation = false) {
       if (!raw || typeof raw !== 'string') return '';
       let s = raw.trim();
       s = s.replace(/^```[\s\S]*?\n/, '').replace(/\n```$/, '');
@@ -129,7 +129,7 @@
       s = s.replace(/^(?:\d+[\.、\s]*)?(?:市政危房维保|临期商超早市|驾校科目考场|急诊老年康养|城中村租房中介|民政婚姻登记|海关安检清关|殡葬法事公墓|县城草台剧组|典当行拍卖|餐饮后厨卫生|业委会物业纠纷|古董文玩鉴定|宠物绝育检疫|长途货运治超|废品回收拆解|澡堂足疗技师|公园象棋摊|农贸水产批发|裁缝铺改衣|修锁配钥匙|广场舞音响|老式国营食堂|高速收费站|异业动作|体面破绽|物理死磕|生活破绽|职业动作|物理极限)[：:\s\-—]*/i, '');
 
       // Strip track / role / prompt labels
-      s = s.replace(/^(?:[A-Ca-c]轨(?:\([^\)]+\)|（[^）]+）)?|Subagent\s*[A-Ca-c]|Track\s*[A-Ca-c]|第[一二三123]轨|最终全场总冠军|全场总冠军|总冠军|最终加冕|加冕|最终金句|加冕金句|金句|冠军初稿|初稿|重铸体|喝止体|折算体|白描体|冷面体|现场体|独白体|台词|回答|解答)[：:\s\-—]*/i, '');
+      s = s.replace(/^(?:[A-Ca-c]轨(?:\([^\)]+\)|（[^）]+）)?|Subagent\s*[A-Ca-c]|Track\s*[A-Ca-c]|第[一二三123]轨|最终全场总冠军|全场总冠军|总冠军|最终加冕|加冕|最终金句|加冕金句|金句|最佳原句|冠军初稿|初稿|重铸体|润色版|喝止体|折算体|白描体|冷面体|现场体|独白体|台词|回答|解答)[：:\s\-—]*/i, '');
 
       // Strip quotes
       s = s.replace(/^[「“"『《\s]+|[」”"』》\s]+$/g, '');
@@ -137,13 +137,15 @@
       // Strip trailing punctuation
       s = s.replace(/[。！？\.\!]+$/, '');
 
-      // Strip internal punctuation and symbols
-      s = s.replace(/[，。！？、：；“”‘’\"\'\`\s\(\)（）\[\]【】《》「」『』—\-_\*•\+\/\\]/g, '');
-      return s.length > 80 ? s.slice(0, 80) : s;
+      if (stripAllPunctuation) {
+        // Strip internal punctuation and symbols only when explicitly requested
+        s = s.replace(/[，。！？、：；“”‘’\"\'\`\s\(\)（）\[\]【】《》「」『』—\-_\*•\+\/\\]/g, '');
+      }
+      return s.length > 120 ? s.slice(0, 120) : s;
     }
     window.cleanPunchline = cleanPunchline;
 
-    // Normalizer for Track A and Track C candidates
+    // Normalizer for Track candidates (supports object {tag, candidate} or raw string)
     function normalizeStringCandidates(raw) {
       let list = [];
       if (Array.isArray(raw)) {
@@ -154,8 +156,10 @@
       return list.map(item => {
         if (typeof item === 'string') return cleanPunchline(item) || item.trim();
         if (item && typeof item === 'object') {
-          const val = item.punchline || item.line || item.text || item.boke || item.content || Object.values(item)[0] || '';
-          return cleanPunchline(String(val)) || String(val).trim();
+          const tag = item.tag || item.category || item.name || '';
+          const val = item.candidate || item.punchline || item.line || item.text || item.boke || item.content || Object.values(item)[0] || '';
+          const cleaned = cleanPunchline(String(val)) || String(val).trim();
+          return tag ? `[${tag}] ${cleaned}` : cleaned;
         }
         return String(item);
       }).filter(s => s && s !== '无');
@@ -171,27 +175,26 @@
       }
       return list.map(item => {
         if (typeof item === 'string') {
-          const match = item.match(/^(\[\d+\]\s*[^：:\s]*|[\[【（\(][^\]】）\)]+[\]】）\)]|\d+[\.、]\s*[^：:\s]+)[:：\s\-—]*(.*)$/);
+          const match = item.match(/^(\[[^\]]+\]|\d+[\.、]\s*[^：:\s]+)[:：\s\-—]*(.*)$/);
           if (match) {
-            return { category: match[1].trim(), punchline: cleanPunchline(match[2]) || match[2].trim() };
+            return { category: match[1].replace(/[\[\]]/g, '').trim(), punchline: cleanPunchline(match[2]) || match[2].trim() };
           }
           return { category: '异业动作', punchline: cleanPunchline(item) || item.trim() };
         }
         if (item && typeof item === 'object') {
-          const cat = item.category || item.domain || item.name || item.industry || item.类别 || item.世俗域 || Object.keys(item)[0] || '异业动作';
-          const punch = item.punchline || item.line || item.action || item.boke || item.text || item.content || item.台词 || Object.values(item)[1] || Object.values(item)[0] || '';
+          const cat = item.tag || item.category || item.domain || item.name || item.industry || item.类别 || item.世俗域 || Object.keys(item)[0] || '异业动作';
+          const punch = item.candidate || item.punchline || item.line || item.action || item.boke || item.text || item.content || item.台词 || Object.values(item)[1] || Object.values(item)[0] || '';
           return { category: String(cat).trim(), punchline: cleanPunchline(String(punch)) || String(punch).trim() };
         }
         return { category: '异业动作', punchline: cleanPunchline(String(item)) || String(item) };
       }).filter(c => c.punchline && c.punchline !== '无');
     }
 
-    // 单实例三轨一次发散：把三段轨道提示词拼装为一次调用的 system prompt。
-    // 拼装头与输出契约和 .agents/skills/oogiri-flow/SKILL.md Stage 1 逐字一致（SSOT）。
-    // 实验依据：bench/ab-divergence/report.md（隔离收益≈0，单次调用合规率更高、调用数减半）
+    // 多轨独立候选生成拼装
     function buildDivergenceSystemPrompt(trackAPrompt, trackBPrompt, trackCPrompt) {
-      return `【本次任务：三轨并行发散，一次完成】
-你将依次完成三条轨道的发散。每条轨道只产出该轨道的候选，三条轨道互不参照、互不借用对方的词，不得合并成一种口吻。全部完成后再输出，顺序如下。
+      return `【本次任务：多轨独立候选生成】
+目标不是把每句答案压成同一种短句，而是找到题目与笑点之间最短、最意外、最自然的连接。
+各方向互不参照、互不借用对方的词。请依次完成已启用方向的候选生成。全部完成后再输出，顺序如下。
 
 === 轨道 A / 体面破绽 ===
 ${trackAPrompt}
@@ -203,9 +206,9 @@ ${trackBPrompt}
 ${trackCPrompt}
 
 【输出契约】只输出合法 JSON，除 JSON 外无任何字符：
-{"A": ["短句1", "短句2", "短句3"],
- "B": [{"category": "[序号] 类别名", "punchline": "台词"}],
- "C": ["短句1", "短句2", "短句3"]}`;
+{"A": [{"tag": "机制标签", "candidate": "候选句子"}],
+ "B": [{"tag": "机制标签", "candidate": "候选句子"}],
+ "C": [{"tag": "机制标签", "candidate": "候选句子"}]}`;
     }
 
 
