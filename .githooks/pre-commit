@@ -78,6 +78,8 @@ fi
 
 violations=()
 n_violations=0
+_DIFF_TMP="$(mktemp 2>/dev/null || echo ".git/diff_cached_tmp.txt")"
+git diff --cached --name-status -z --no-renames --diff-filter=AM > "$_DIFF_TMP"
 while IFS= read -r -d '' st && IFS= read -r -d '' path; do
   base="${path##*/}"
 
@@ -110,7 +112,8 @@ while IFS= read -r -d '' st && IFS= read -r -d '' path; do
 
   violations+=("$size|$path|$note")
   n_violations=$((n_violations + 1))
-done < <(git diff --cached --name-status -z --no-renames --diff-filter=AM)
+done < "$_DIFF_TMP"
+rm -f "$_DIFF_TMP"
 
 [ "$n_violations" -eq 0 ] && exit 0
 
