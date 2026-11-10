@@ -44,7 +44,8 @@
                 body: JSON.stringify({
                   model: config.model.trim(),
                   messages: messagesPayload,
-                  temperature: config.temperature !== undefined ? config.temperature : 0.7
+                  temperature: config.temperature !== undefined ? config.temperature : 0.7,
+                  stream: true
                 }),
                 signal: controller.signal
               });
@@ -56,10 +57,60 @@
                 throw Object.assign(new Error(`HTTP ${res.status}: ${errTxt.slice(0, 120)}`), { fatal: !retryable });
               }
 
-              const data = await res.json();
-              const content = data.choices?.[0]?.message?.content;
-              if (!content) throw new Error("Empty choices in response");
-              return content;
+              const contentType = res.headers.get('content-type') || '';
+              if (contentType.includes('text/event-stream')) {
+                const reader = res.body.getReader();
+                const decoder = new TextDecoder('utf-8');
+                let buffer = '';
+                let content = '';
+                let reasoning = '';
+
+                while (true) {
+                  const { done, value } = await reader.read();
+                  if (done) break;
+                  buffer += decoder.decode(value, { stream: true });
+                  const lines = buffer.split('\n');
+                  buffer = lines.pop() || '';
+                  for (const line of lines) {
+                    const trimmed = line.trim();
+                    if (!trimmed.startsWith('data:')) continue;
+                    const dataStr = trimmed.slice(5).trim();
+                    if (dataStr === '[DONE]') continue;
+                    try {
+                      const json = JSON.parse(dataStr);
+                      const delta = json.choices?.[0]?.delta;
+                      if (delta?.content) content += delta.content;
+                      else if (delta?.reasoning_content) reasoning += delta.reasoning_content;
+                    } catch (_) {}
+                  }
+                }
+                const finalContent = content || reasoning;
+                if (!finalContent) throw new Error("Empty choices in stream response");
+                return finalContent;
+              }
+
+              // 非流式或未标明 event-stream 的回退处理
+              const text = await res.text();
+              try {
+                const data = JSON.parse(text);
+                const content = data.choices?.[0]?.message?.content;
+                if (content) return content;
+              } catch (_) {}
+
+              if (text.includes('data:')) {
+                let sseContent = '';
+                for (const line of text.split('\n')) {
+                  const trimmed = line.trim();
+                  if (!trimmed.startsWith('data:') || trimmed.includes('[DONE]')) continue;
+                  try {
+                    const delta = JSON.parse(trimmed.slice(5).trim()).choices?.[0]?.delta;
+                    if (delta?.content) sseContent += delta.content;
+                  } catch (_) {}
+                }
+                if (sseContent) return sseContent;
+              }
+
+              throw new Error("Empty choices in response");
 
             } catch (err) {
               // 超时属于等待超时，直接抛出，严禁在思考超时后让用户从头被动重试 3 遍
