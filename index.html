@@ -378,15 +378,7 @@
               title="点击一键复制金句"
             >
               <!-- Champion Tag -->
-              <div class="flex items-center justify-between space-x-2 text-[11px] text-emerald-900 border-b border-emerald-600/20 pb-1.5 mb-2">
-                <div class="flex items-center space-x-1 font-bold">
-                  <span class="text-sm">🏆</span>
-                  <span>全场总冠军金句</span>
-                </div>
-                <span class="text-[10px] bg-white/70 px-1.5 py-0.5 rounded font-mono text-emerald-800">
-                  {{ msg.champion.length }}字{{ /[，。！？、：；“”‘’"'\s]/.test(msg.champion) ? '' : ' · 零标点' }}
-                </span>
-              </div>
+              <div class="hidden"></div>
 
               <!-- Main Punchline Text (Prominent & Striking) -->
               <div class="py-1">
@@ -581,77 +573,55 @@
                       <p class="whitespace-pre-line">{{ msg.pipelineState.stage2.duel_records || msg.pipelineState.stage2.pk_interrogation }}</p>
                     </div>
 
-                    <!-- Track Champions & Initial Champion -->
-                    <div class="grid grid-cols-2 gap-1.5 text-[10px]">
-                      <div class="bg-gray-100 p-1.5 rounded">
-                        <span class="text-gray-500">轨道冠军初选：</span>
-                        <div class="font-medium text-gray-800 mt-0.5">A: {{ msg.pipelineState.stage2.track_champions?.trackA }}</div>
-                        <div class="font-medium text-gray-800">B: {{ msg.pipelineState.stage2.track_champions?.trackB }}</div>
-                        <div class="font-medium text-gray-800">C: {{ msg.pipelineState.stage2.track_champions?.trackC }}</div>
+                    <!-- Initial Champion & Selected Punchline -->
+                    <div class="bg-amber-100/70 p-2 rounded border border-amber-200 text-[10px]">
+                      <div class="flex items-center justify-between">
+                        <span class="text-amber-800 font-semibold">评审推选初稿：</span>
+                        <span class="text-[9px] text-amber-700/80">未经二次剪裁的原句</span>
                       </div>
-                      <div class="bg-amber-100/70 p-1.5 rounded border border-amber-200">
-                        <span class="text-amber-800 font-semibold">总冠军初稿：</span>
-                        <div class="font-bold text-gray-900 mt-1 text-[11px]">{{ msg.pipelineState.stage2.initial_champion }}</div>
-                      </div>
+                      <div class="font-bold text-gray-900 mt-1 text-[11px]">{{ msg.pipelineState.stage2.initial_champion }}</div>
                     </div>
 
-                    <!-- 3-Way Recast Comparison (Only shown when recast occurred) -->
-                    <div v-if="msg.pipelineState.stage2.recast_variants && (msg.pipelineState.stage2.recast_variants.monologue || msg.pipelineState.stage2.recast_variants.quantified || msg.pipelineState.stage2.recast_variants.cold_sketch)" class="bg-emerald-50/70 border border-emerald-200/80 rounded-lg p-2 space-y-1.5 text-[11px]">
+                    <!-- Recast Comparison (Only shown when recast occurred) -->
+                    <div v-if="msg.pipelineState.stage2.recast_variants && (msg.pipelineState.stage2.recast_variants.variant_1 || msg.pipelineState.stage2.recast_variants.variant_2 || msg.pipelineState.stage2.recast_variants.monologue || msg.pipelineState.stage2.recast_variants.cold_sketch)" class="bg-emerald-50/70 border border-emerald-200/80 rounded-lg p-2 space-y-1.5 text-[11px]">
                       <div class="font-bold text-emerald-950 flex items-center justify-between">
-                        <span>三向句式打磨对比</span>
-                        <span class="text-[10px] text-emerald-700">锁死器物与核心事件</span>
+                        <span>提炼与润色备选</span>
+                        <span class="text-[10px] text-emerald-700">剪除赘述 · 保留核心</span>
                       </div>
                       <div class="space-y-1.5">
-                        <div class="bg-white p-1.5 rounded border border-emerald-100 flex justify-between items-center">
+                        <div v-if="msg.pipelineState.stage2.recast_variants.variant_1 || msg.pipelineState.stage2.recast_variants.monologue" class="bg-white p-1.5 rounded border border-emerald-100 flex justify-between items-center">
                           <div class="flex items-center space-x-1.5 overflow-hidden pr-2">
-                            <span class="text-[10px] text-gray-500 font-mono shrink-0">[现场喝止体]</span>
-                            <span class="font-bold text-gray-800 truncate">{{ msg.pipelineState.stage2.recast_variants?.monologue }}</span>
+                            <span class="text-[10px] text-gray-500 font-mono shrink-0">[润色版 1]</span>
+                            <span class="font-bold text-gray-800 truncate">{{ msg.pipelineState.stage2.recast_variants.variant_1 || msg.pipelineState.stage2.recast_variants.monologue }}</span>
                           </div>
                           <button 
-                            v-if="msg.pipelineState.stage2.recast_variants?.monologue"
                             type="button"
-                            @click="crownManualVariant(msg, msg.pipelineState.stage2.recast_variants.monologue, '现场喝止体')"
-                            :class="['px-2 py-0.5 rounded text-[10px] shrink-0 font-medium active:scale-95 transition cursor-pointer', msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.monologue) ? 'bg-amber-100 text-amber-800 font-bold border border-amber-300' : 'bg-gray-100 hover:bg-amber-50 text-gray-700 hover:text-amber-800 border border-gray-200']"
-                            title="将此变体手动平反加冕为全场总冠军"
+                            @click="crownManualVariant(msg, msg.pipelineState.stage2.recast_variants.variant_1 || msg.pipelineState.stage2.recast_variants.monologue, '润色版 1')"
+                            :class="['px-2 py-0.5 rounded text-[10px] shrink-0 font-medium active:scale-95 transition cursor-pointer', msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.variant_1 || msg.pipelineState.stage2.recast_variants.monologue) ? 'bg-amber-100 text-amber-800 font-bold border border-amber-300' : 'bg-gray-100 hover:bg-amber-50 text-gray-700 hover:text-amber-800 border border-gray-200']"
+                            title="将此变体手动设为全场总冠军"
                           >
-                            {{ msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.monologue) ? '👑 已是冠军' : '👑 设为冠军' }}
+                            {{ msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.variant_1 || msg.pipelineState.stage2.recast_variants.monologue) ? '👑 已是冠军' : '👑 设为冠军' }}
                           </button>
                         </div>
-                        <div class="bg-white p-1.5 rounded border border-emerald-100 flex justify-between items-center">
+                        <div v-if="msg.pipelineState.stage2.recast_variants.variant_2 || msg.pipelineState.stage2.recast_variants.cold_sketch" class="bg-white p-1.5 rounded border border-emerald-100 flex justify-between items-center">
                           <div class="flex items-center space-x-1.5 overflow-hidden pr-2">
-                            <span class="text-[10px] text-gray-500 font-mono shrink-0">[量化规矩体]</span>
-                            <span class="font-bold text-gray-800 truncate">{{ msg.pipelineState.stage2.recast_variants?.quantified }}</span>
+                            <span class="text-[10px] text-gray-500 font-mono shrink-0">[润色版 2]</span>
+                            <span class="font-bold text-gray-800 truncate">{{ msg.pipelineState.stage2.recast_variants.variant_2 || msg.pipelineState.stage2.recast_variants.cold_sketch }}</span>
                           </div>
                           <button 
-                            v-if="msg.pipelineState.stage2.recast_variants?.quantified"
                             type="button"
-                            @click="crownManualVariant(msg, msg.pipelineState.stage2.recast_variants.quantified, '量化规矩体')"
-                            :class="['px-2 py-0.5 rounded text-[10px] shrink-0 font-medium active:scale-95 transition cursor-pointer', msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.quantified) ? 'bg-amber-100 text-amber-800 font-bold border border-amber-300' : 'bg-gray-100 hover:bg-amber-50 text-gray-700 hover:text-amber-800 border border-gray-200']"
-                            title="将此变体手动平反加冕为全场总冠军"
+                            @click="crownManualVariant(msg, msg.pipelineState.stage2.recast_variants.variant_2 || msg.pipelineState.stage2.recast_variants.cold_sketch, '润色版 2')"
+                            :class="['px-2 py-0.5 rounded text-[10px] shrink-0 font-medium active:scale-95 transition cursor-pointer', msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.variant_2 || msg.pipelineState.stage2.recast_variants.cold_sketch) ? 'bg-amber-100 text-amber-800 font-bold border border-amber-300' : 'bg-gray-100 hover:bg-amber-50 text-gray-700 hover:text-amber-800 border border-gray-200']"
+                            title="将此变体手动设为全场总冠军"
                           >
-                            {{ msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.quantified) ? '👑 已是冠军' : '👑 设为冠军' }}
-                          </button>
-                        </div>
-                        <div class="bg-white p-1.5 rounded border border-emerald-100 flex justify-between items-center">
-                          <div class="flex items-center space-x-1.5 overflow-hidden pr-2">
-                            <span class="text-[10px] text-gray-500 font-mono shrink-0">[冷面白描体]</span>
-                            <span class="font-bold text-gray-800 truncate">{{ msg.pipelineState.stage2.recast_variants?.cold_sketch }}</span>
-                          </div>
-                          <button 
-                            v-if="msg.pipelineState.stage2.recast_variants?.cold_sketch"
-                            type="button"
-                            @click="crownManualVariant(msg, msg.pipelineState.stage2.recast_variants.cold_sketch, '冷面白描体')"
-                            :class="['px-2 py-0.5 rounded text-[10px] shrink-0 font-medium active:scale-95 transition cursor-pointer', msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.cold_sketch) ? 'bg-amber-100 text-amber-800 font-bold border border-amber-300' : 'bg-gray-100 hover:bg-amber-50 text-gray-700 hover:text-amber-800 border border-gray-200']"
-                            title="将此变体手动平反加冕为全场总冠军"
-                          >
-                            {{ msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.cold_sketch) ? '👑 已是冠军' : '👑 设为冠军' }}
+                            {{ msg.champion === cleanPunchline(msg.pipelineState.stage2.recast_variants.variant_2 || msg.pipelineState.stage2.recast_variants.cold_sketch) ? '👑 已是冠军' : '👑 设为冠军' }}
                           </button>
                         </div>
                       </div>
                     </div>
-                    <div v-else class="bg-amber-50/80 border border-dashed border-amber-300 rounded-lg p-2 text-[10px] text-amber-900 flex items-center justify-between">
-                      <span class="font-semibold text-amber-800">未达到高质量初稿标准</span>
-                      <span>已跳过二次打磨，优选相对最佳初稿直出为冠军金句</span>
+                    <div v-else class="bg-emerald-50/70 border border-dashed border-emerald-200/80 rounded-lg p-2 text-[10px] text-emerald-900 flex items-center justify-between">
+                      <span class="font-semibold text-emerald-800">原句利落无需润色</span>
+                      <span>已坚决保留原汁原味初稿直出为冠军金句</span>
                     </div>
 
                     <!-- Crowning Reason -->
