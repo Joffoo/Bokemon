@@ -415,14 +415,6 @@
 
             <!-- CANVAS MEME PREVIEW (For image questions) -->
             <div v-if="!msg.isGenerating && msg.memeDataUrl" class="mt-2.5 max-w-sm bg-white border border-wechat-border rounded-xl p-2.5 shadow-sm">
-              <div class="flex items-center justify-between mb-2 px-1">
-                <span class="text-xs font-bold text-gray-800 flex items-center space-x-1">
-                  <span>🎨</span>
-                  <span>看图大喜利压字成品</span>
-                </span>
-                <span class="text-[10px] bg-red-100 text-red-700 px-1.5 py-0.5 rounded font-semibold">日式综艺压字</span>
-              </div>
-
               <!-- Meme Image View -->
               <div class="rounded-lg overflow-hidden border border-gray-200 cursor-pointer relative group" @click="openImagePreview(msg.memeDataUrl, '看图大喜利压字成品')">
                 <img :src="msg.memeDataUrl" alt="大喜利压字成品" class="w-full max-h-64 object-cover">
