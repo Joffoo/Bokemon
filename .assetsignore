@@ -1,0 +1,12 @@
+_worker.js
+wrangler.toml
+.git
+.github
+.agents
+.githooks
+bench
+docs
+api
+__pycache__
+*.bat
+*.py
