@@ -373,22 +373,32 @@
             <!-- COMPLETED CHAMPION GREEN BUBBLE -->
             <div 
               v-if="!msg.isGenerating && msg.champion" 
-              class="bg-wechat-bubbleGreen border border-wechat-bubbleGreenBorder rounded-xl p-3.5 shadow-sm text-wechat-text bubble-tail-right max-w-full cursor-pointer hover:brightness-95 active:scale-[0.99] transition"
-              @click="copyPunchline(msg.champion)"
-              title="点击一键复制金句"
+              :class="['rounded-xl p-3.5 shadow-sm bubble-tail-right max-w-full transition', msg.champion.startsWith('执行遇阻：') ? 'bg-amber-50 border border-amber-300 text-amber-950' : 'bg-wechat-bubbleGreen border border-wechat-bubbleGreenBorder text-wechat-text cursor-pointer hover:brightness-95 active:scale-[0.99]']"
+              @click="!msg.champion.startsWith('执行遇阻：') && copyPunchline(msg.champion)"
+              :title="msg.champion.startsWith('执行遇阻：') ? '生成遇阻，请点击下方按钮恢复或换个角度' : '点击一键复制金句'"
             >
               <!-- Champion Tag -->
               <div class="hidden"></div>
 
               <!-- Main Punchline Text (Prominent & Striking) -->
               <div class="py-1">
-                <h2 class="text-xl sm:text-2xl font-black text-gray-950 tracking-wide font-variety leading-snug">
+                <h2 :class="['text-xl sm:text-2xl font-black tracking-wide leading-snug', msg.champion.startsWith('执行遇阻：') ? 'text-amber-900 text-base sm:text-lg font-sans' : 'text-gray-950 font-variety']">
                   {{ msg.champion }}
                 </h2>
               </div>
 
-              <div class="mt-2 text-[10px] text-emerald-800/80 flex items-center justify-between pt-1.5 border-t border-emerald-600/15">
+              <div :class="['mt-2 text-[10px] flex items-center justify-between pt-1.5 border-t', msg.champion.startsWith('执行遇阻：') ? 'text-amber-800/80 border-amber-300/40' : 'text-emerald-800/80 border-emerald-600/15']">
                 <div class="flex items-center space-x-1.5">
+                  <button 
+                    v-if="msg.pipelineState?.currentStageName === '✕ 异常中断' || msg.champion.startsWith('执行遇阻：')"
+                    type="button" 
+                    @click.stop="resumePipeline(msg)"
+                    :disabled="isGeneratingAny"
+                    class="px-2 py-0.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-md font-bold text-[11px] active:scale-95 transition flex items-center space-x-1 shadow-2xs cursor-pointer"
+                    title="断点续传：若候选词已生成，直接重试第3步推敲选优，无需重新发散"
+                  >
+                    <span>🔄 恢复执行</span>
+                  </button>
                   <button 
                     type="button" 
                     @click.stop="rerollPunchline(msg)"
@@ -399,6 +409,7 @@
                     <span>🎲 换个角度</span>
                   </button>
                   <button 
+                    v-if="!msg.champion.startsWith('执行遇阻：')"
                     type="button" 
                     @click.stop="openSharePosterModal(msg)"
                     class="px-2 py-0.5 bg-white/85 hover:bg-white text-emerald-950 border border-emerald-600/30 rounded-md font-bold text-[11px] active:scale-95 transition flex items-center space-x-1 shadow-2xs cursor-pointer"
@@ -407,8 +418,11 @@
                     <span>🖼️ 分享图</span>
                   </button>
                 </div>
-                <div class="flex items-center space-x-1.5 text-emerald-900/80 font-medium">
+                <div v-if="!msg.champion.startsWith('执行遇阻：')" class="flex items-center space-x-1.5 text-emerald-900/80 font-medium">
                   <span>📋 点击气泡复制</span>
+                </div>
+                <div v-else class="flex items-center space-x-1.5 text-amber-800 font-medium text-[10px]">
+                  <span>⚠️ 阶段异常</span>
                 </div>
               </div>
             </div>

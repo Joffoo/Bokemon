@@ -78,6 +78,8 @@ BK.buildSetupTail = function () {
           resetNewGame,
           crownManualVariant,
           rerollPunchline,
+          resumePipeline,
+          getExistingCandidates,
           cleanPunchline,
           cleanDirectReply,
           sharePosterModal,

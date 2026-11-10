@@ -129,3 +129,98 @@
           }
         }
 
+        function getExistingCandidates(playerMsg) {
+          const ps = playerMsg.pipelineState;
+          if (!ps) return [];
+          const rawPool = [
+            ...(ps.trackA?.candidates || []).map(c => cleanPunchline(c)),
+            ...(ps.trackB?.candidates || []).map(b => cleanPunchline(b.punchline || b.line || b)),
+            ...(ps.trackC?.candidates || []).map(c => cleanPunchline(c))
+          ].filter(line => line && !line.includes('无') && line.length > 3);
+          const uniquePool = Array.from(new Set(rawPool));
+          return uniquePool.map((line, idx) => `候选 ${idx + 1}: ${line}`);
+        }
+
+        async function resumePipeline(playerMsg) {
+          if (isGeneratingAny.value || playerMsg.isGenerating) return;
+
+          if (!config.apiKey) {
+            showSettingsModal.value = true;
+            testStatus.value = 'error';
+            testMessage.value = '请先填写 API Key 才能向大模型发起实时请求！';
+            return;
+          }
+
+          const hostMsg = findHostMessage(playerMsg);
+          const text = hostMsg ? hostMsg.text : '';
+          const img = hostMsg ? hostMsg.imageDataUrl : null;
+
+          isGeneratingAny.value = true;
+          playerMsg.isGenerating = true;
+          playStartSound();
+
+          // DIRECT MODE BRANCH
+          if (!playerMsg.pipelineState) {
+            try {
+              const directSystemPrompt = `请对下面的大喜利题目给出一句幽默搞笑的回答，只输出这一句话本身。`;
+              const reply = await callLlmWithBackoff({
+                systemPrompt: directSystemPrompt,
+                userPrompt: text || `请根据图片做一句极品大喜利回答`,
+                imageBase64: img
+              });
+              const cleaned = cleanDirectReply(reply) || cleanPunchline(reply) || '大喜利金句生成完毕';
+              playerMsg.champion = cleaned;
+              if (img) {
+                try {
+                  const memeUrl = await renderCanvasMeme(img, cleaned);
+                  playerMsg.memeDataUrl = memeUrl;
+                } catch (e) {}
+              }
+              playChampionSound();
+              showToast('🚀 已恢复执行并生成金句！');
+            } catch (err) {
+              console.error('Direct resume error:', err);
+              playerMsg.champion = '执行遇阻：' + err.message;
+              showToast('生成异常：' + err.message);
+            } finally {
+              playerMsg.isGenerating = false;
+              isGeneratingAny.value = false;
+              scrollToBottom();
+            }
+            return;
+          }
+
+          // WORKFLOW MODE BRANCH (Resume from breakpoint)
+          try {
+            // Step 1: Stage 0 (Check if already present)
+            const hasStage0 = Boolean(playerMsg.pipelineState?.stage0?.raw_telemetry);
+            if (!hasStage0) {
+              await _sendStage0(playerMsg, text, img);
+            }
+
+            // Step 2: Divergence Candidates (Check if already present)
+            let allCandidates = getExistingCandidates(playerMsg);
+            if (allCandidates.length === 0) {
+              allCandidates = await _sendDiverge(playerMsg, text, img);
+            } else {
+              playerMsg.pipelineState.currentStage = 1;
+              playerMsg.pipelineState.currentStageName = '✓ 已复用先前生成的候选词池';
+            }
+
+            // Step 3: Judge & Crowning
+            await _sendJudge(playerMsg, text, img, allCandidates);
+          } catch (err) {
+            console.error('Pipeline resume error:', err);
+            playerMsg.champion = '执行遇阻：' + err.message;
+            playerMsg.pipelineState.currentStageName = '✕ 异常中断';
+            showToast('恢复中断：' + err.message, 3500);
+          } finally {
+            playerMsg.isGenerating = false;
+            isGeneratingAny.value = false;
+            scrollToBottom();
+          }
+        }
+
+        window.resumePipeline = resumePipeline;
+        window.getExistingCandidates = getExistingCandidates;
+
