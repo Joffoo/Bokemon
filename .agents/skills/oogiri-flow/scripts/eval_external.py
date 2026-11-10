@@ -235,7 +235,7 @@ def main():
             })
             
         # Save output JSON
-        out_json_path = f"C:\\Users\\14840\\.gemini\\antigravity\\brain\\238ac0c9-66e9-40d8-9805-c3df8ac07995\\scratch\\eval_{model_name.replace('-', '_')}.json"
+        out_json_path = f"eval_{model_name.replace('-', '_')}.json"
         with open(out_json_path, "w", encoding="utf-8") as f:
             json.dump(results, f, ensure_ascii=False, indent=2)
         print(f"\n[Saved JSON]: {out_json_path}")

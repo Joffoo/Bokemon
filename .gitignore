@@ -85,3 +85,4 @@ bench/ab-divergence/summary.json
 bench/ab-divergence/shots/
 
 scratch_*.txt
+eval_*.json
