@@ -12,6 +12,8 @@
 [![Tailwind CSS](https://img.shields.io/badge/TailwindCSS-CDN-38bdf8.svg)](https://tailwindcss.com/)
 [![Zero Backend](https://img.shields.io/badge/Architecture-100%25%20Serverless-07C160.svg)]()
 
+🌐 **在线体验**：[https://bokemon.joffoo.workers.dev/](https://bokemon.joffoo.workers.dev/)
+
 [简体中文](#-简体中文) • [English](#-english) • [日本語](#-日本語)
 
 <br/>

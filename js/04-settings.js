@@ -144,7 +144,7 @@
               } catch (e) {
                 // TypeError: Failed to fetch = 网络层/跨域层失败（拿不到状态码），补上端点与可能原因
                 lastErr = lastErr || ((e && e.message === 'Failed to fetch')
-                  ? new Error(`浏览器无法连接 ${ep}（网络不通、被代理/防火墙/浏览器插件拦截，或该服务端未开放浏览器跨域 CORS。若是 CORS，请双击项目里的「启动.bat」，用它打开的地址使用）`)
+                  ? new Error(`浏览器无法连接 ${ep}（网络不通、被代理/防火墙拦截，或该服务端未开放跨域 CORS。可手动输入模型名称直接使用，或确认 API 中转支持跨域）`)
                   : e);
               }
             }
@@ -230,7 +230,7 @@
             testMessage.value = '✓ 连通成功！模型响应正常。';
           } catch (err) {
             testStatus.value = 'error';
-            testMessage.value = err.name === 'AbortError' ? '连通失败：请求超时，服务端长时间无响应' : (err.message === 'Failed to fetch' ? '连通失败：浏览器无法连接该地址（网络不通，或服务端未开放跨域 CORS。若是 CORS，请双击项目里的「启动.bat」，用它打开的地址使用）' : `连通失败：${err.message}`);
+            testMessage.value = err.name === 'AbortError' ? '连通失败：请求超时，服务端长时间无响应' : (err.message === 'Failed to fetch' ? '连通失败：浏览器无法连接该地址（网络不通，或服务端未开放跨域 CORS。可确认 API 地址或中转站是否支持跨域）' : `连通失败：${err.message}`);
           } finally {
             clearTimeout(testTimerId);
             testingApi.value = false;
