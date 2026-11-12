@@ -48,7 +48,7 @@ description: 日式大喜利（Oogiri / Ogiri）企划。先由主 Agent 读题�
 
 每个方向生成 3～5 条候选，优先保证笑点成立、题目贴合和画面/语境清楚。每条候选附一个不超过 6 字的内部机制标签，例如“身份误认”“礼仪露馅”“物理反咬”；不要写长篇解释。最终候选正文可以是完整自然句，标点和长度暂不作为淘汰条件。
 
-拼装规范（与 `index.html` 的 `buildDivergenceSystemPrompt` 逐字一致）：
+拼装规范（与 `js/00-helpers.js` 的 `buildDivergenceSystemPrompt` 逐字一致）：
 
 ```
 【本次任务：多轨独立候选生成】

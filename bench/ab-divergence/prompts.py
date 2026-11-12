@@ -1,9 +1,9 @@
-﻿#!/usr/bin/env python3
+#!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""从 index.html 里逐字提取三轨 + Stage 2 提示词，保证实验与线上提示词零漂移。
+"""从 js/ 模块里逐字提取三轨 + Stage 2 提示词，保证实验与线上提示词零漂移。
 
 为什么要抽取而不是复制：复制一份就等于多一个真源，改一处漏一处时实验结论立刻失真。
-index.html 里这些提示词是 JS 模板字符串，`${...}` 位置用运行时变量填充；这里按表达式特征
+js/ 模块里这些提示词是 JS 模板字符串，`${...}` 位置用运行时变量填充；这里按表达式特征
 识别后替换，遇到未知表达式直接报错，绝不静默留空。
 """
 from __future__ import annotations
@@ -11,11 +11,13 @@ from __future__ import annotations
 import argparse
 import hashlib
 import re
-import sysif hasattr(sys.stdout, 'reconfigure'): sys.stdout.reconfigure(encoding='utf-8')
+import sys
+if hasattr(sys.stdout, 'reconfigure'):
+    sys.stdout.reconfigure(encoding='utf-8')
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
-# 提示词真源：拆分后位于 js/ 模块（03/11/12 含轨道与 Stage 0，14/15/16/17 含 handleSend 侧，18 含尾段）
+# 提示词真源：拆分后位于 js/ 模块（Stage 0：15-send-stage.js；三轨：16-send-diverge.js / 12-reroll-diverge.js；Stage 2：17-send-judge.js / 13-reroll-judge.js；拼装函数：00-helpers.js）
 SOURCES = [ROOT / "index.html"] + sorted((ROOT / "js").glob("*.js"))
 
 _VARS = {

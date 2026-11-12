@@ -1,17 +1,17 @@
 # Bokeman（大喜利金句工作台）
 
-单页应用（BYOK、无后端）：用户出题（文字/图片），按 oogiri-flow 三轨发散产出大喜利金句并压字成图。
+单页应用（BYOK、无后端）：用户出题（文字/图片），按 oogiri-flow 三段流程产出大喜利金句并压字成图。
 
 ## Language
 
 ### 工作流阶段
 
 **Stage 0（地基切片）**:
-从命题提取纯物理事实（原生器物、力学微姿态）、平庸三阱与预筛世俗域，供三轨共用。
+从命题提取纯物理事实（原生器物、力学微姿态）、平庸三阱，供后续阶段共用。
 _Avoid_: 分析题面、题面解析
 
 **发散段（Stage 1）**:
-单实例一次完成三轨候选的生成段，输出统一 JSON（A/C 各 3 句、B 按世俗域清单逐类）。
+单实例一次完成三轨候选的生成段，输出统一 JSON（A/B/C 各 3～5 条候选，每条附不超过 6 字的机制标签）。
 _Avoid_: 三轨并行（旧架构，已废止，见 docs/adr/0001）
 
 **公诉人段（Stage 2）**:
@@ -23,11 +23,11 @@ _Avoid_: 三轨并行（旧架构，已废止，见 docs/adr/0001）
 ### 提示词治理
 
 **提示词真源（SSOT）**:
-Stage 0/1/2 提示词的权威文本，位于 `js/15|16|17`（发送侧）与 `js/12|13`（reroll 侧），必须与 `.agents/skills/oogiri-flow/SKILL.md` 逐字一致。
+Stage 0/1/2 提示词的权威文本，位于 `js/15-send-stage.js`（Stage 0）、`js/16-send-diverge.js`（三轨）、`js/17-send-judge.js`（Stage 2），必须与 `.agents/skills/oogiri-flow/SKILL.md` 逐字一致。Reroll 侧副本在 `js/12-reroll-diverge.js` 和 `js/13-reroll-judge.js`。
 _Avoid_: 在 index.html 里找提示词（拆分后已不在）
 
 **提示词指纹**:
-五个提示词模板的 SHA-256 前 12 位（`bench/ab-divergence/prompts.py`），用于跨拆分/跨提交验证提示词零漂移，当前 d2a0c8cdc780。
+五个提示词模板的 SHA-256 前 12 位（`bench/ab-divergence/prompts.py`），用于跨拆分/跨提交验证提示词零漂移，当前 1a2021345e46（执行 `python bench/ab-divergence/prompts.py` 确认）。
 
 **双端一致**:
 SKILL.md 与 js/ 模块的同名提示词逐字相同的铁律；由 `prompts.py` 的 `check_duplicates()` 机器核对。

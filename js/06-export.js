@@ -64,9 +64,6 @@
               });
               md += `\n`;
             }
-            if (s0.secular_domains && s0.secular_domains.length) {
-              md += `- 【**预选世俗域**】：${s0.secular_domains.join('、')}\n\n`;
-            }
 
             // Stage 1
             md += `### 🚀 Stage 1 · 三轨一次发散候选池\n\n`;

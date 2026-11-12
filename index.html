@@ -205,7 +205,7 @@
           @click="pipelineMode = (pipelineMode === 'workflow' ? 'direct' : 'workflow')"
           class="px-2 py-0.5 rounded-full text-[11px] font-semibold transition active:scale-95 cursor-pointer flex items-center space-x-1 border"
           :class="pipelineMode === 'workflow' ? 'bg-emerald-50 text-emerald-800 border-emerald-300 hover:bg-emerald-100' : 'bg-amber-50 text-amber-800 border-amber-300 hover:bg-amber-100'"
-          :title="pipelineMode === 'workflow' ? '当前模式：4段多Agent深度工作流（点击切换为单次极简模式）' : '当前模式：极简单次提示词直出模式（点击切换回4段多Agent工作流）'"
+          :title="pipelineMode === 'workflow' ? '当前模式：三段式完整工作流（点击切换为单次极简模式）' : '当前模式：极简单次提示词直出模式（点击切换回三段式完整工作流）'"
         >
           <span>{{ pipelineMode === 'workflow' ? '⚡ 完整工作流' : '🚀 极简直出' }}</span>
         </button>
@@ -377,9 +377,6 @@
               @click="!msg.champion.startsWith('执行遇阻：') && copyPunchline(msg.champion)"
               :title="msg.champion.startsWith('执行遇阻：') ? '生成遇阻，请点击下方按钮恢复或换个角度' : '点击一键复制金句'"
             >
-              <!-- Champion Tag -->
-              <div class="hidden"></div>
-
               <!-- Main Punchline Text (Prominent & Striking) -->
               <div class="py-1">
                 <h2 :class="['text-xl sm:text-2xl font-black tracking-wide leading-snug', msg.champion.startsWith('执行遇阻：') ? 'text-amber-900 text-base sm:text-lg font-sans' : 'text-gray-950 font-variety']">
@@ -502,11 +499,6 @@
                       </ul>
                     </div>
 
-                    <!-- Secular Domains -->
-                    <div v-if="msg.pipelineState.stage0.secular_domains && msg.pipelineState.stage0.secular_domains.length" class="text-[10px] text-gray-600">
-                      <span class="font-semibold text-gray-700">预选世俗域：</span>
-                      <span class="bg-gray-100 px-1 py-0.5 rounded mr-1 inline-block mt-1" v-for="dom in msg.pipelineState.stage0.secular_domains" :key="dom">{{ dom }}</span>
-                    </div>
                   </div>
 
                   <!-- Stage 1: Three Parallel Tracks -->

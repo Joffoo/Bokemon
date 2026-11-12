@@ -389,5 +389,3 @@
           if (track.status === 'failed') return '✕ 已跳过';
           return '等待';
         }
-
-        // Mock Preset Demo Execution

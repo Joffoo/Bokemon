@@ -72,7 +72,7 @@
               showToast('🚀 极简模式：已秒出金句！');
             } catch (err) {
               console.error('Direct generation error:', err);
-              playerMsg.champion = '生成遇到异常：' + err.message;
+              playerMsg.champion = '执行遇阻：' + err.message;
               showToast('生成异常：' + err.message);
             } finally {
               playerMsg.isGenerating = false;
@@ -82,7 +82,7 @@
             return;
           }
 
-          // WORKFLOW MODE BRANCH (4-Stage Multi-Agent)
+          // WORKFLOW MODE BRANCH (Three-Stage Pipeline)
           // Append Player Placeholder
           const playerMsg = reactive({
             id: Date.now() + 1,
@@ -96,7 +96,7 @@
             pipelineState: {
               currentStage: 0,
               currentStageName: '分析题面常识中...',
-              stage0: { raw_telemetry: '', forbidden_baseline: [], secular_domains: [] },
+              stage0: { raw_telemetry: '', forbidden_baseline: [] },
               trackA: { status: 'idle', retries: 0, candidates: [] },
               trackB: { status: 'idle', retries: 0, candidates: [] },
               trackC: { status: 'idle', retries: 0, candidates: [] },

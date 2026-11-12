@@ -1,6 +1,6 @@
 # 实验设计：三轨并行（3 个独立实例） vs 单 Agent 一次发散
 
-> 状态：待执行（设计冻结版）
+> 状态：已完成（结论见 docs/adr/0001-oogiri-divergence-single-instance.md）
 > 对象：`oogiri-flow` Stage 1 发散段
 > 唯一操纵变量：上下文边界
 > 判定：预注册，先过硬门槛，再看主指标；平局有既定规则

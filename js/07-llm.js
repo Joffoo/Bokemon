@@ -132,5 +132,3 @@
             }
           }
         }
-
-        // Client-side HTML5 Canvas Meme Rendering (Strictly replicating render_meme.py)

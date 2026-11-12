@@ -38,7 +38,7 @@
           showToast('已复制金句到剪切板 ✓');
         }
 
-        // Load saved settings & credentials
+        // Shared AudioContext (lazy init + resume)
         function getAudioContext() {
           try {
             if (!audioCtx) {
@@ -146,7 +146,7 @@
         }
 
         // ==========================================
-        // EXPORT TO STRUCTURED OBSIDIAN-READY MARKDOWN
+        // RESET NEW GAME
         // ==========================================
         function resetNewGame() {
           isGeneratingAny.value = false;
@@ -166,7 +166,7 @@
           showToast('已重置对局，新一轮大喜利已就绪');
         }
 
-        // Helper: Find preceding host message
+        // Auto-scroll chat container to bottom
         function scrollToBottom() {
           nextTick(() => {
             if (chatContainer.value) {
@@ -174,5 +174,3 @@
             }
           });
         }
-
-        // Robust JSON Extractor from LLM replies with trailing comma repair

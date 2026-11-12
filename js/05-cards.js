@@ -35,7 +35,7 @@
           showToast(`已将【${variantType}】平反加冕为全场总冠军！👑`);
         }
 
-        // Re-roll Punchline reusing Stage 0 Telemetry
+        // Handle image attachment upload (auto-downscale to JPEG data URL)
         function handleImageUpload(e) {
           const file = e.target.files && e.target.files[0];
           if (!file) return;
@@ -132,5 +132,3 @@
           document.body.removeChild(a);
           showToast('已开始下载压字 PNG');
         }
-
-        // Auto-scroll chat container to bottom

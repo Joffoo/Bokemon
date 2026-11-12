@@ -58,6 +58,7 @@ module.exports = async (req, res) => {
 
   try {
     const body = req.method === 'POST' ? await readBody(req) : undefined;
+    // 58s 主动超时：略低于 vercel.json 的 maxDuration=60s，确保函数先返回 502 而不是被平台强杀
     const up = await fetch(target.toString(), { method: req.method, headers, body, redirect: 'manual', signal: AbortSignal.timeout(58000) });
     res.statusCode = up.status;
     res.setHeader('X-Bokeman-Proxy', '1');

@@ -49,8 +49,7 @@ async function _sendStage0(playerMsg, text, img) {
             playerMsg.pipelineState.stage0 = {
               raw_telemetry: parsedS0.raw_telemetry || '',
               routing: parsedS0.routing || {},
-              forbidden_baseline: parsedS0.forbidden_baseline || [],
-              secular_domains: []
+              forbidden_baseline: parsedS0.forbidden_baseline || []
             };
 
             // ==========================================

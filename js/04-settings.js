@@ -236,5 +236,3 @@
             testingApi.value = false;
           }
         }
-
-        // Handle Image Attachment with Auto-Downscaling (prevents HTTP 413 / network bottleneck)

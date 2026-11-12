@@ -34,7 +34,7 @@
             pipelineState: {
               currentStage: 0,
               currentStageName: '分析题面常识中...',
-              stage0: { raw_telemetry: '', forbidden_baseline: [], secular_domains: [] },
+              stage0: { raw_telemetry: '', forbidden_baseline: [] },
               trackA: { status: 'idle', retries: 0, candidates: [] },
               trackB: { status: 'idle', retries: 0, candidates: [] },
               trackC: { status: 'idle', retries: 0, candidates: [] },
@@ -59,10 +59,6 @@
               "[阱1 现实观察] 人太多了分钱不均吵架解散（现实叹气观察）",
               "[阱2 廉价网梗] 只要人够多排练室都装不下（网梗套路）",
               "[阱3 情绪直给] 根本听不清主唱在唱什么太吵了（情绪直给吐槽）"
-            ],
-            secular_domains: [
-              "[1] 市政危房维保", "[3] 驾校科目考场", "[7] 海关安检清关", "[12] 业委会物业纠纷",
-              "[15] 长途货运治超", "[24] 高速收费站"
             ]
           };
 

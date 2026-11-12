@@ -25,17 +25,7 @@
         try { return await viaProxy(e); } catch (e2) { BK_NEEDS_PROXY.delete(origin); throw e; }
       }
     }
-    // 24 Macro Ecological Secular Domains from SKILL.md
-    const SECULAR_DOMAINS_24 = [
-      "[1] 市政危房维保",   "[2] 临期商超早市",   "[3] 驾校科目考场",   "[4] 急诊老年康养",
-      "[5] 城中村租房中介", "[6] 民政婚姻登记",   "[7] 海关安检清关",   "[8] 殡葬法事公墓",
-      "[9] 县城草台剧组",   "[10] 典当行拍卖",    "[11] 餐饮后厨卫生",  "[12] 业委会物业纠纷",
-      "[13] 古董文玩鉴定",  "[14] 宠物绝育检疫",  "[15] 长途货运治超",  "[16] 废品回收拆解",
-      "[17] 澡堂足疗技师",  "[18] 公园象棋摊",    "[19] 农贸水产批发",  "[20] 裁缝铺改衣",
-      "[21] 修锁配钥匙",    "[22] 广场舞音响",    "[23] 老式国营食堂",  "[24] 高速收费站"
-    ];
 
-    // Helper: Build a minimal standalone SVG Data URL for presets
     // Helper: Build a minimal standalone SVG Data URL for presets
     function createPresetImageSvg(title, bgGradient, mainIcon) {
       const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="600" height="450" viewBox="0 0 600 450">

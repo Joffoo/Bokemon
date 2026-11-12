@@ -53,8 +53,7 @@
           // Reuse existing stage 0 telemetry
           const s0 = playerMsg.pipelineState?.stage0 || {
             raw_telemetry: `围绕命题「${promptText}」的常识地基器物与日常场景。`,
-            forbidden_baseline: ['[阱1 现实观察] 现实叹气吐槽', '[阱2 廉价网梗] 常见烂梗', '[阱3 情绪直给] 情绪宣泄'],
-            secular_domains: SECULAR_DOMAINS_24.slice(0, 8)
+            forbidden_baseline: ['[阱1 现实观察] 现实叹气吐槽', '[阱2 廉价网梗] 常见烂梗', '[阱3 情绪直给] 情绪宣泄']
           };
 
           playerMsg.pipelineState.currentStage = 1;
